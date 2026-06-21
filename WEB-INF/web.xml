@@ -7,16 +7,18 @@
 
     <display-name>App Test Framework</display-name>
 
-    <!-- FRONT CONTROLLER -->
-    <servlet>
-        <servlet-name>FrontController</servlet-name>
-        <servlet-class>framework.FrontControllerServlet</servlet-class>
-    </servlet>
+<servlet>
+    <servlet-name>FrontController</servlet-name>
+    <servlet-class>core.DispatcherServlet</servlet-class>
+    <init-param>
+        <param-name>controller</param-name>
+        <param-value>app.controllers</param-value>
+    </init-param>
+</servlet>
 
-    <servlet-mapping>
-        <servlet-name>FrontController</servlet-name>
-        <url-pattern>/app/*</url-pattern>
-    </servlet-mapping>
-
+<servlet-mapping>
+    <servlet-name>FrontController</servlet-name>
+    <url-pattern>/app/*</url-pattern>
+</servlet-mapping>
 
 </web-app>
