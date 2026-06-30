@@ -44,9 +44,8 @@ if [ ! -s sources.txt ]; then
     rm -f sources.txt
     exit 1
 fi
-
 javac \
--cp "$APP_LIB/$JAR_NAME" \
+-cp "$APP_LIB/$JAR_NAME:$TOMCAT_HOME/lib/servlet-api.jar" \
 -d "$APP_CLASSES" \
 @sources.txt
 
