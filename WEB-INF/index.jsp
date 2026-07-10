@@ -14,7 +14,11 @@
 
         <% if (nom !=null) { %>
             <p>
-                <%= nom %>
+                <%= nom.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#x27;") %>
             </p>
             <% } %>
     </body>
