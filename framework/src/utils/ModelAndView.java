@@ -28,7 +28,9 @@ public class ModelAndView {
         return this.attributes;
     }
 
-    public void addAttribute(String key, Object value) {
-        this.attributes.put(key, value);
+public void addAttribute(String key, Object value) {
+    if (this.attributes == null) {
+        this.attributes = new HashMap<>();
     }
+    this.attributes.put(key, value);
 }
