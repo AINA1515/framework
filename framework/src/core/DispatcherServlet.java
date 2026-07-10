@@ -16,6 +16,7 @@ public class DispatcherServlet extends HttpServlet {
     List<Class<?>> controllerClasses = new ArrayList<>();
     Map<UrlMappingDTO, ControllerResultDTO> map;
 
+    
     @Override
     @SuppressWarnings("unchecked")
     public void init() throws ServletException {
@@ -66,12 +67,13 @@ public class DispatcherServlet extends HttpServlet {
             response.getWriter().println("Méthode Java : " + method.getName());
             response.getWriter().println();
 
-            try {
-                Object controllerInstance = controllerClasse.getDeclaredConstructor().newInstance();
+            // Une méthode "simple" (sans paramètre HttpServletRequest/
+            // HttpServletResponse) est réellement exécutée par réflexion,
+            // et son résultat est affiché.
+            if (method.getParameterCount() == 0) {
 
-                // Sprint 2 — méthode simple sans paramètre
-                if (method.getParameterCount() == 0) {
-
+                try {
+                    Object controllerInstance = controllerClasse.getDeclaredConstructor().newInstance();
                     Object result = method.invoke(controllerInstance);
 
                     if (result instanceof ModelAndView) {
@@ -97,26 +99,15 @@ public class DispatcherServlet extends HttpServlet {
                         response.getWriter().println(String.valueOf(result));
                     }
 
-                    // Sprint 3 — méthode GET/POST avec (HttpServletRequest, HttpServletResponse)
-                } else {
-
-                    Class<?>[] paramTypes = method.getParameterTypes();
-
-                    if (paramTypes.length == 2
-                            && paramTypes[0].getName().equals("jakarta.servlet.http.HttpServletRequest")
-                            && paramTypes[1].getName().equals("jakarta.servlet.http.HttpServletResponse")) {
-
-                        method.invoke(controllerInstance, request, response);
-
-                    } else {
-                        response.getWriter().println("=== ERREUR ===");
-                        response.getWriter().println("Signature non supportée : " + method.getName());
-                    }
+                } catch (Exception e) {
+                    response.getWriter().println("=== ERREUR D'EXECUTION ===");
+                    response.getWriter().println(e.getCause() != null ? e.getCause().toString() : e.toString());
                 }
 
-            } catch (Exception e) {
-                response.getWriter().println("=== ERREUR D'EXECUTION ===");
-                response.getWriter().println(e.getCause() != null ? e.getCause().toString() : e.toString());
+            } else {
+                // Méthode avec paramètres (ex: HttpServletRequest, HttpServletResponse)
+                // : exécution non gérée par cette voie.
+                response.getWriter().println("(méthode avec paramètres : exécution non gérée par cette voie)");
             }
 
             return;
@@ -126,7 +117,7 @@ public class DispatcherServlet extends HttpServlet {
         // URL INCONNUE
         // =========================
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        response.getWriter().println(" Route introuvable");
+        response.getWriter().println("❌ Route introuvable");
         response.getWriter().println("URL : " + path);
         response.getWriter().println("HTTP : " + httpMethod);
         response.getWriter().println();
