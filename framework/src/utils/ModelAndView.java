@@ -7,9 +7,9 @@ public class ModelAndView {
     private String view;
     private Map<String, Object> attributes;
 
-    public ModelAndView() {
-
-    }
+public ModelAndView() {
+    this.attributes = new HashMap<>();
+}
 
     public ModelAndView(String view) {
         this.view = view;
