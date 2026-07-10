@@ -15,21 +15,19 @@ public class DispatcherServlet extends HttpServlet {
     List<Class<?>> controllerClasses = new ArrayList<>();
     Map<UrlMappingDTO, ControllerResultDTO> map;
 
+    
     @Override
+    @SuppressWarnings("unchecked")
     public void init() throws ServletException {
-        try {
-            String controllersPackage = getServletConfig().getInitParameter("controller");
-            controllerClasses = utils.ControllerUtils.getControllerClasses(controllersPackage);
+        map = (Map<UrlMappingDTO, ControllerResultDTO>) getServletContext().getAttribute("urlMap");
+        controllerClasses = (List<Class<?>>) getServletContext().getAttribute("controllerClasses");
 
-            map = utils.ControllerUtils.getAllMapUrlMethod(controllerClasses);
-
-            System.out.println("Classes de contrôleur trouvées dans le package '" + controllersPackage + "':");
-            for (Class<?> clazz : controllerClasses) {
-                System.out.println(clazz.getName());
-            }
-        } catch (Exception e) {
-            throw new ServletException("Erreur lors du scan des contrôleurs", e);
+        if (map == null || controllerClasses == null) {
+            throw new ServletException(
+                    "urlMap ou controllerClasses non initialisés — AppListener a-t-il bien démarré ?");
         }
+
+        System.out.println("DispatcherServlet initialisé, " + map.size() + " route(s) chargée(s).");
     }
 
     public void affichage(HttpServletRequest request, HttpServletResponse response)
@@ -68,12 +66,13 @@ public class DispatcherServlet extends HttpServlet {
             response.getWriter().println("Méthode Java : " + method.getName());
             response.getWriter().println();
 
-            try {
-                Object controllerInstance = controllerClasse.getDeclaredConstructor().newInstance();
+            // Une méthode "simple" (sans paramètre HttpServletRequest/
+            // HttpServletResponse) est réellement exécutée par réflexion,
+            // et son résultat est affiché.
+            if (method.getParameterCount() == 0) {
 
-                // Sprint 2 — méthode simple sans paramètre
-                if (method.getParameterCount() == 0) {
-
+                try {
+                    Object controllerInstance = controllerClasse.getDeclaredConstructor().newInstance();
                     Object result = method.invoke(controllerInstance);
 
                     response.getWriter().println("=== RESULTAT DE L'EXECUTION ===");
@@ -84,26 +83,15 @@ public class DispatcherServlet extends HttpServlet {
                         response.getWriter().println(String.valueOf(result));
                     }
 
-                    // Sprint 3 — méthode GET/POST avec (HttpServletRequest, HttpServletResponse)
-                } else {
-
-                    Class<?>[] paramTypes = method.getParameterTypes();
-
-                    if (paramTypes.length == 2
-                            && paramTypes[0].getName().equals("jakarta.servlet.http.HttpServletRequest")
-                            && paramTypes[1].getName().equals("jakarta.servlet.http.HttpServletResponse")) {
-
-                        method.invoke(controllerInstance, request, response);
-
-                    } else {
-                        response.getWriter().println("=== ERREUR ===");
-                        response.getWriter().println("Signature non supportée : " + method.getName());
-                    }
+                } catch (Exception e) {
+                    response.getWriter().println("=== ERREUR D'EXECUTION ===");
+                    response.getWriter().println(e.getCause() != null ? e.getCause().toString() : e.toString());
                 }
 
-            } catch (Exception e) {
-                response.getWriter().println("=== ERREUR D'EXECUTION ===");
-                response.getWriter().println(e.getCause() != null ? e.getCause().toString() : e.toString());
+            } else {
+                // Méthode avec paramètres (ex: HttpServletRequest, HttpServletResponse)
+                // : exécution non gérée par cette voie.
+                response.getWriter().println("(méthode avec paramètres : exécution non gérée par cette voie)");
             }
 
             return;
@@ -113,7 +101,7 @@ public class DispatcherServlet extends HttpServlet {
         // URL INCONNUE
         // =========================
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        response.getWriter().println(" Route introuvable");
+        response.getWriter().println("❌ Route introuvable");
         response.getWriter().println("URL : " + path);
         response.getWriter().println("HTTP : " + httpMethod);
         response.getWriter().println();
