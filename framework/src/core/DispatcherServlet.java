@@ -74,20 +74,29 @@ public class DispatcherServlet extends HttpServlet {
 
                     Object result = method.invoke(controllerInstance);
 
-                    if (result instanceof ModelAndView) {
-                        ModelAndView mv = (ModelAndView) result;
-                        String nomPackage = (String) this.getServletContext().getInitParameter("pafSource");
-                        String nomExtension = (String) this.getServletContext().getInitParameter("extension");
-                        String view = "/" + nomPackage + mv.getView() + nomExtension;
-                        Map<String, Object> attributes = mv.getAttributes();
+if (result instanceof ModelAndView) {
+    ModelAndView mv = (ModelAndView) result;
 
-                        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-                            request.setAttribute(entry.getKey(), entry.getValue());
-                        }
-                        request.getRequestDispatcher(view).forward(request, response);
-                        return;
+    // Ne pas forward si la réponse est déjà commitée (println() plus haut)
+    if (response.isCommitted()) {
+        throw new ServletException("Impossible de forward : la réponse est déjà commitée");
+    }
+    response.resetBuffer();
+    response.setContentType("text/html;charset=UTF-8");
 
-                    }
+    String nomPackage = (String) getServletContext().getInitParameter("pafSource");
+    String nomExtension = (String) getServletContext().getInitParameter("extension");
+    String view = "/" + nomPackage + mv.getView() + nomExtension;
+    Map<String, Object> attributes = mv.getAttributes();
+
+    if (attributes != null) {
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            request.setAttribute(entry.getKey(), entry.getValue());
+        }
+    }
+    request.getRequestDispatcher(view).forward(request, response);
+    return;
+}
 
                     response.getWriter().println("=== RESULTAT DE L'EXECUTION ===");
 
