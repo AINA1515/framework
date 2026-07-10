@@ -21,4 +21,18 @@
     <url-pattern>/app/*</url-pattern>
 </servlet-mapping>
 
+<context-param>
+    <param-name>controller</param-name>
+    <param-value>app.controllers</param-value>
+</context-param>
+
+<listener>
+    <listener-class>listener.AppListener</listener-class>
+</listener>
+
+<servlet>
+    <servlet-name>FrontController</servlet-name>
+    <servlet-class>core.DispatcherServlet</servlet-class>
+</servlet>
+
 </web-app>
