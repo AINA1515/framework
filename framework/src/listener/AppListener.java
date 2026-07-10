@@ -35,7 +35,7 @@ public class AppListener implements ServletContextListener {
             System.out.println("Erreur AppListener : " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de l'initialisation de l'application", e);
         }
     }
 
