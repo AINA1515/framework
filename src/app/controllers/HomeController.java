@@ -9,14 +9,11 @@ import annotation.UrlMapping;
 import dto.UrlMappingDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import utils.ModelAndView;
 
 @Controller
 public class HomeController {
 
-    @UrlMapping(url = "/home", method = "GET")
-    public void home(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.getWriter().println("Bonjour ");
-    }
 
     @UrlMapping(url = "/home", method = "GET")
     public void homes(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -28,17 +25,10 @@ public class HomeController {
         return "Test OK";
     }
 
-    void main() {
-        UrlMappingDTO a = new UrlMappingDTO("/home", "GET");
-        UrlMappingDTO b = new UrlMappingDTO("/home", "GET");
-
-        System.out.println("equals : " + a.equals(b));
-        System.out.println("hashCode a : " + a.hashCode());
-        System.out.println("hashCode b : " + b.hashCode());
-
-        Map<UrlMappingDTO, String> map = new HashMap<>();
-        map.put(a, "premier");
-        System.out.println("containsKey b : " + map.containsKey(b));
+    @UrlMapping(url = "/index")
+    public ModelAndView index() {
+        ModelAndView modelAndView = new ModelAndView("index");
+        modelAndView.addAttribute("message", "Bonjour depuis le contrôleur !");
+        return modelAndView;
     }
-
 }

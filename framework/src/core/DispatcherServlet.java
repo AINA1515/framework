@@ -8,6 +8,7 @@ import java.util.Map;
 
 import dto.ControllerResultDTO;
 import dto.UrlMappingDTO;
+import utils.ModelAndView;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 
@@ -16,20 +17,17 @@ public class DispatcherServlet extends HttpServlet {
     Map<UrlMappingDTO, ControllerResultDTO> map;
 
     @Override
+    @SuppressWarnings("unchecked")
     public void init() throws ServletException {
-        try {
-            String controllersPackage = getServletConfig().getInitParameter("controller");
-            controllerClasses = utils.ControllerUtils.getControllerClasses(controllersPackage);
+        map = (Map<UrlMappingDTO, ControllerResultDTO>) getServletContext().getAttribute("urlMap");
+        controllerClasses = (List<Class<?>>) getServletContext().getAttribute("controllerClasses");
 
-            map = utils.ControllerUtils.getAllMapUrlMethod(controllerClasses);
-
-            System.out.println("Classes de contrôleur trouvées dans le package '" + controllersPackage + "':");
-            for (Class<?> clazz : controllerClasses) {
-                System.out.println(clazz.getName());
-            }
-        } catch (Exception e) {
-            throw new ServletException("Erreur lors du scan des contrôleurs", e);
+        if (map == null || controllerClasses == null) {
+            throw new ServletException(
+                    "urlMap ou controllerClasses non initialisés — AppListener a-t-il bien démarré ?");
         }
+
+        System.out.println("DispatcherServlet initialisé, " + map.size() + " route(s) chargée(s).");
     }
 
     public void affichage(HttpServletRequest request, HttpServletResponse response)
@@ -75,6 +73,21 @@ public class DispatcherServlet extends HttpServlet {
                 if (method.getParameterCount() == 0) {
 
                     Object result = method.invoke(controllerInstance);
+
+                    if (result instanceof ModelAndView) {
+                        ModelAndView mv = (ModelAndView) result;
+                        String nomPackage = (String) this.getServletContext().getInitParameter("pafSource");
+                        String nomExtension = (String) this.getServletContext().getInitParameter("extension");
+                        String view = "/" + nomPackage + mv.getView() + nomExtension;
+                        Map<String, Object> attributes = mv.getAttributes();
+
+                        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+                            request.setAttribute(entry.getKey(), entry.getValue());
+                        }
+                        request.getRequestDispatcher(view).forward(request, response);
+                        return;
+
+                    }
 
                     response.getWriter().println("=== RESULTAT DE L'EXECUTION ===");
 

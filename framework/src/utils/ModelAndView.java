@@ -1,0 +1,34 @@
+package utils;
+
+import java.util.Map;
+import java.util.HashMap;
+
+public class ModelAndView {
+    private String view;
+    private Map<String, Object> attributes;
+
+    public ModelAndView() {
+
+    }
+
+    public ModelAndView(String view) {
+        this.view = view;
+        this.attributes = new HashMap<>();
+    }
+
+    public String getView() {
+        return this.view;
+    }
+
+    public void setView(String view) {
+        this.view = view;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return this.attributes;
+    }
+
+    public void addAttribute(String key, Object value) {
+        this.attributes.put(key, value);
+    }
+}
