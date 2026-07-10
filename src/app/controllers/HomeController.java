@@ -1,13 +1,9 @@
 package app.controllers;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import annotation.Controller;
 import annotation.UrlMapping;
-import dto.UrlMappingDTO;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import utils.ModelAndView;
 

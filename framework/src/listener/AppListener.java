@@ -2,13 +2,11 @@ package listener;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.annotation.WebListener;
 import java.util.List;
 import java.util.Map;
 import dto.ControllerResultDTO;
 import dto.UrlMappingDTO;
 
-@WebListener
 public class AppListener implements ServletContextListener {
 
     @Override
@@ -37,7 +35,7 @@ public class AppListener implements ServletContextListener {
             System.out.println("Erreur AppListener : " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de l'initialisation de l'application", e);
         }
     }
 

@@ -14,7 +14,7 @@
 
     <context-param>
         <param-name>pafSource</param-name>
-        <param-value>/WEB-INF/</param-value>
+        <param-value>WEB-INF/</param-value>
     </context-param>
     <context-param>
         <param-name>extension</param-name>
