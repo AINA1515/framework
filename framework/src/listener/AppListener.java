@@ -2,13 +2,11 @@ package listener;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.annotation.WebListener;
 import java.util.List;
 import java.util.Map;
 import dto.ControllerResultDTO;
 import dto.UrlMappingDTO;
 
-@WebListener
 public class AppListener implements ServletContextListener {
 
     @Override
