@@ -134,11 +134,16 @@ public class ControllerUtils {
                 dto.setClasse(classe);
                 dto.setMethod(method);
 
+                if (result.containsKey(mapping)) {
+                    throw new RuntimeException(
+                            "URL en double détectée : " + annotation.method() + " " + annotation.url()
+                                    + " → déjà mappée sur " + result.get(mapping).getMethod().getName()
+                                    + ", conflit avec " + method.getName());
+                }
                 result.put(mapping, dto);
             }
         }
 
         return result;
     }
-
 }
