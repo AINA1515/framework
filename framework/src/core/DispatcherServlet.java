@@ -94,8 +94,6 @@ public class DispatcherServlet extends HttpServlet {
             Method method = found.getMethod();
             Class<?> controllerClasse = found.getClasse();
 
-            boolean isWebApi = utils.ControllerUtils.isWebApi(controllerClasse);
-
             try {
                 Object controllerInstance = controllerClasse.getDeclaredConstructor().newInstance();
 
@@ -130,7 +128,7 @@ public class DispatcherServlet extends HttpServlet {
                     }
 
                     // Retour JSON — contrôleur @WebApi sans paramètre
-                    if (isWebApi) {
+                    if (utils.ControllerUtils.isWebApi(method)) {
                         response.setContentType("application/json;charset=UTF-8");
                         response.getWriter().println(toJson(result));
                         return;

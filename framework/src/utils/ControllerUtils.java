@@ -61,8 +61,8 @@ public class ControllerUtils {
         return controllerClasses;
     }
 
-    public static boolean isWebApi(Class<?> classe) {
-        return classe.isAnnotationPresent(annotation.WebApi.class);
+    public static boolean isWebApi(Method m) {
+        return m.isAnnotationPresent(annotation.WebApi.class);
     }
 
     // =========================
