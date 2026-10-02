@@ -52,8 +52,7 @@ public class ControllerUtils {
         List<Class<?>> allClasses = getFiles(packageName);
 
         for (Class<?> clazz : allClasses) {
-            if (clazz.isAnnotationPresent(annotation.Controller.class)
-                    || clazz.isAnnotationPresent(annotation.WebApi.class)) {
+            if (clazz.isAnnotationPresent(annotation.Controller.class)) {
                 controllerClasses.add(clazz);
             }
         }

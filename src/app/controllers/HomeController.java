@@ -3,14 +3,19 @@ package app.controllers;
 import java.io.IOException;
 
 import annotation.Controller;
+import annotation.Injection;
 import annotation.UrlMapping;
 import annotation.WebApi;
-import app.models.User;
+import app.model.UserModel;
+import app.repository.UserRepository;
 import jakarta.servlet.http.*;
 import utils.ModelAndView;
 
 @Controller
 public class HomeController {
+
+    @Injection
+    private UserRepository userRepository;
 
     @UrlMapping(url = "/home", method = "GET")
     public void homes(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -37,7 +42,14 @@ public class HomeController {
 
     @UrlMapping(url = "/api/user")
     @WebApi
-    public User getUser() {
-        return new User("Aina", "aina@itu.mg");
+    public UserModel getUser() {
+        return new UserModel("John Doe", "password123");
+    }
+
+    @UrlMapping(url = "/test19", method = "GET")
+    public ModelAndView mamo() {
+        ModelAndView modelAndView = new ModelAndView("viewAndrana");
+        modelAndView.addAttribute("message1", userRepository.findById(1L).orElse(null).getUsername());
+        return modelAndView;
     }
 }
