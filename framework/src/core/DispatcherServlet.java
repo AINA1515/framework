@@ -16,16 +16,18 @@ import com.google.gson.Gson;
 public class DispatcherServlet extends HttpServlet {
     List<Class<?>> controllerClasses = new ArrayList<>();
     Map<UrlMappingDTO, ControllerResultDTO> map;
+    Map<Class<?>, Object> controllerInstances;
 
     @Override
     @SuppressWarnings("unchecked")
     public void init() throws ServletException {
         map = (Map<UrlMappingDTO, ControllerResultDTO>) getServletContext().getAttribute("urlMap");
         controllerClasses = (List<Class<?>>) getServletContext().getAttribute("controllerClasses");
+        controllerInstances = (Map<Class<?>, Object>) getServletContext().getAttribute("controllerInstances");
 
-        if (map == null || controllerClasses == null) {
+        if (map == null || controllerClasses == null || controllerInstances == null) {
             throw new ServletException(
-                    "urlMap ou controllerClasses non initialisés — AppListener a-t-il bien démarré ?");
+                    "urlMap, controllerClasses ou controllerInstances non initialisés — AppListener a-t-il bien démarré ?");
         }
 
         System.out.println("DispatcherServlet initialisé, " + map.size() + " route(s) chargée(s).");
@@ -59,7 +61,7 @@ public class DispatcherServlet extends HttpServlet {
             Class<?> controllerClasse = found.getClasse();
 
             try {
-                Object controllerInstance = controllerClasse.getDeclaredConstructor().newInstance();
+                Object controllerInstance = controllerInstances.get(controllerClasse);
 
                 if (method.getParameterCount() == 0) {
 

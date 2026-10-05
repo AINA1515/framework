@@ -2,6 +2,7 @@ package listener;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,27 +33,33 @@ public class AppListener implements ServletContextListener {
             WebApplicationContext springContext = WebApplicationContextUtils
                     .getRequiredWebApplicationContext(sce.getServletContext());
 
+            Map<Class<?>, Object> controllerInstances = new HashMap<>();
+
             for (Class<?> c : controllerClasses) {
                 System.out.println("  -> " + c.getName());
 
-                // 🏗️ On crée l'instance unique (le Singleton) du contrôleur
+                // On crée l'instance unique (le Singleton) du contrôleur
                 Object controllerInstance = c.getDeclaredConstructor().newInstance();
 
-                // 🪞 On inspecte les attributs pour l'injection
+                // On inspecte les attributs pour l'injection
                 Field[] fields = c.getDeclaredFields();
                 for (Field field : fields) {
                     if (field.isAnnotationPresent(Injection.class)) {
                         Class<?> fieldType = field.getType();
 
-                        // 🍃 On récupère le bean Spring
+                        // On récupère le bean Spring
                         Object bean = springContext.getBean(fieldType);
 
-                        // 💉 On injecte le bean dans notre INSTANCE de contrôleur
+                        // On injecte le bean dans notre INSTANCE de contrôleur
                         field.setAccessible(true);
                         field.set(controllerInstance, bean);
                     }
                 }
+
+                controllerInstances.put(c, controllerInstance);
             }
+            sce.getServletContext().setAttribute("controllerInstances", controllerInstances);
+
             System.out.println("Routes enregistrées : " + map.size());
             for (UrlMappingDTO key : map.keySet()) {
                 ControllerResultDTO val = map.get(key);
@@ -71,6 +78,7 @@ public class AppListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         sce.getServletContext().removeAttribute("urlMap");
         sce.getServletContext().removeAttribute("controllerClasses");
+        sce.getServletContext().removeAttribute("controllerInstances");
         System.out.println("=== AppListener : Application arrêtée ===");
     }
 }

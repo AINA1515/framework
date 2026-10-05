@@ -48,7 +48,7 @@ public class HomeController {
 
     @UrlMapping(url = "/test19", method = "GET")
     public ModelAndView mamo() {
-        ModelAndView modelAndView = new ModelAndView("viewAndrana");
+        ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addAttribute("message1", userRepository.findById(1L).orElse(null).getUsername());
         return modelAndView;
     }
