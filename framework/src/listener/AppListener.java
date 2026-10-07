@@ -55,7 +55,6 @@ public class AppListener implements ServletContextListener {
                         field.set(controllerInstance, bean);
                     }
                 }
-
                 controllerInstances.put(c, controllerInstance);
             }
             sce.getServletContext().setAttribute("controllerInstances", controllerInstances);

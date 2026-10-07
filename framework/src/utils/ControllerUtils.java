@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.*;
+
 public class ControllerUtils {
 
     public static List<Class<?>> getFiles(String packageName) {
@@ -158,7 +160,12 @@ public class ControllerUtils {
             Parameter p = params[i];
             Class<?> type = p.getType();
 
-            if (type == HttpServletRequest.class) {
+
+            if(params[i].isAnnotationPresent(annotation.Parameter.class)) {
+                annotation.Parameter paramAnnotation = params[i].getAnnotation(annotation.Parameter.class);
+                String paramName = paramAnnotation.value();
+                args[i] = convert(request.getParameter(paramName), type, paramName);
+            } else if (type == HttpServletRequest.class) {
                 args[i] = request;
             } else if (type == HttpServletResponse.class) {
                 args[i] = response;

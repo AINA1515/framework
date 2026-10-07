@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import annotation.Controller;
 import annotation.Injection;
+import annotation.Parameter;
 import annotation.UrlMapping;
 import annotation.WebApi;
 import app.model.UserModel;
@@ -46,10 +47,22 @@ public class HomeController {
         return new UserModel("John Doe", "password123");
     }
 
-    @UrlMapping(url = "/test19", method = "GET")
+    @UrlMapping(url = "/testBase", method = "GET")
     public ModelAndView mamo() {
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addAttribute("message1", userRepository.findById(1L).orElse(null).getUsername());
         return modelAndView;
+    }
+
+    @UrlMapping(url = "/addition", method = "GET")
+    public ModelAndView formulaire() {
+        return new ModelAndView("form");
+    }
+
+    @UrlMapping(url = "/addition", method = "POST")
+    public ModelAndView calculer(@Parameter("a") int a, @Parameter("b") int b) {
+        ModelAndView mv = new ModelAndView("form");
+        mv.addAttribute("resultat", a + b);
+        return mv;
     }
 }
