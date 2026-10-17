@@ -91,7 +91,7 @@ public class DispatcherServlet extends HttpServlet {
                     return;
                 }
 
-                // Retour JSON — contrôleur @WebApi sans paramètre
+                // Retour JSON — controleur @WebApi sans paramètre
                 if (utils.ControllerUtils.isWebApi(method)) {
                     response.setContentType("application/json;charset=UTF-8");
                     Gson gson = new Gson();
@@ -100,7 +100,7 @@ public class DispatcherServlet extends HttpServlet {
                     return;
                 }
 
-                // Retour texte simple — contrôleur @Controller
+                // Retour texte simple — controleur @Controller
                 response.setContentType("text/plain");
                 response.getWriter().println("=== ROUTE TROUVEE ===");
                 response.getWriter().println("URL : " + path);

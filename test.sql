@@ -16,3 +16,9 @@ create table IF NOT EXISTS user (
     FOREIGN KEY (adresse_id) REFERENCES adresse(id)
 );
 
+create table if NOT EXISTS fichier (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    extension VARCHAR(20),
+    contenu LONGBLOB NOT NULL
+);
