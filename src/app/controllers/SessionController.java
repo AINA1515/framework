@@ -9,6 +9,7 @@ import annotation.Parameter;
 import annotation.UrlMapping;
 import annotation.WebApi;
 import utils.ModelAndView;
+import utils.MySession;
 import utils.UploadedFile;
 import app.model.UserModel;
 import app.model.AdresseModel;
@@ -31,4 +32,17 @@ public class SessionController {
     @Injection
     private FichierRepository fichierRepository;
 
+    @UrlMapping(url = "/compteur", method = "GET")
+    public String compteur(MySession session) {
+        Integer n = (Integer) session.get("n");
+        n = (n == null) ? 1 : n + 1;
+        session.add("n", n);
+        return "Visite numero " + n;
+    }
+
+    @UrlMapping(url = "/compteur/reset", method = "GET")
+    public String resetCompteur(MySession session) {
+        session.invalidate();
+        return "Session reinitialisee";
+    }
 }
