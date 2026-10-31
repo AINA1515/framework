@@ -1,5 +1,6 @@
 package utils;
 
+import annotation.Injection;
 import annotation.UrlMapping;
 import dto.ControllerResultDTO;
 import dto.UrlMappingDTO;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import jakarta.servlet.http.HttpSession;
 
-
+import org.springframework.web.context.WebApplicationContext;
 import jakarta.servlet.http.*;
 import jakarta.servlet.ServletException;
 
@@ -349,7 +350,7 @@ public class ControllerUtils {
 
         if (hs == null) {
             if (current.isEmpty()) {
-                return; // rien a ecrire : pas de session creee pour rien
+                return; // rien a ecrire : pas de session cree pour rien
             }
             hs = request.getSession(); // nouvelle session
         }
@@ -366,6 +367,27 @@ public class ControllerUtils {
             if (!initial.containsKey(e.getKey()) || !Objects.equals(initial.get(e.getKey()), e.getValue())) {
                 hs.setAttribute(e.getKey(), e.getValue());
             }
+        }
+    }
+
+    // SINGLETON
+    public static Object createController(Class<?> c, WebApplicationContext springContext) {
+        try {
+            System.out.println("Controller cree : " + c.getName());
+
+            Object instance = c.getDeclaredConstructor().newInstance();
+
+            for (Field field : c.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Injection.class)) {
+                    Object bean = springContext.getBean(field.getType());
+                    field.setAccessible(true);
+                    field.set(instance, bean);
+                }
+            }
+            return instance;
+
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Impossible de creer le controleur " + c.getName(), e);
         }
     }
 
