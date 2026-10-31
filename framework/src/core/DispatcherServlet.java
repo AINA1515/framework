@@ -14,6 +14,9 @@ import jakarta.servlet.http.*;
 import com.google.gson.Gson;
 import annotation.Auth;
 
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 public class DispatcherServlet extends HttpServlet {
     List<Class<?>> controllerClasses = new ArrayList<>();
     Map<UrlMappingDTO, ControllerResultDTO> map;
@@ -21,6 +24,7 @@ public class DispatcherServlet extends HttpServlet {
     String authSessionKey;
     String authRoleKey;
     String authLoginUrl;
+    WebApplicationContext springContext;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -41,6 +45,8 @@ public class DispatcherServlet extends HttpServlet {
             throw new ServletException(
                     "urlMap, controllerClasses ou controllerInstances non initialisés — AppListener a-t-il bien démarré ?");
         }
+
+        springContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 
         System.out.println("DispatcherServlet initialisé, " + map.size() + " route(s) chargée(s).");
     }
@@ -73,7 +79,7 @@ public class DispatcherServlet extends HttpServlet {
             Class<?> controllerClasse = found.getClasse();
 
             try {
-                Object controllerInstance = controllerInstances.get(controllerClasse);
+                // Object controllerInstance = controllerInstances.get(controllerClasse);
 
                 Auth auth = method.getAnnotation(Auth.class);
                 if (auth == null) {
@@ -110,9 +116,12 @@ public class DispatcherServlet extends HttpServlet {
                         }
                     }
                 }
-                
+                Object controllerInstance = controllerInstances.computeIfAbsent(controllerClasse,
+                        c -> utils.ControllerUtils.createController(c, springContext));
+
                 Object[] args = utils.ControllerUtils.buildArguments(method, request, response);
                 Object result = method.invoke(controllerInstance, args);
+
 
                 for (Object arg : args) {
                     if (arg instanceof utils.MySession) {
